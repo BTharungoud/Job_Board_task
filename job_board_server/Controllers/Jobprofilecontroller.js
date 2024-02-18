@@ -1,5 +1,5 @@
 import Jobprofile from "../Models/JobprofileSchema.js";
-
+import Applicant from "../Models/Applicant_schema.js";
 const getJobprofiles = async (req,res)=>{
     try{
         const Jobprofiles = await Jobprofile.find();
@@ -52,4 +52,32 @@ const updateJobprofile = async (req,res) => {
       }
 }
 
-export{getJobprofiles,postJobprofile,updateJobprofile}
+const addApplicant = async (req,res) => {
+    try{
+        const {id,email} = req.body
+        const applicant = await Applicant.findOne({email:email})
+        const Applicants = await Jobprofile.findById({_id:id})
+        const updateapplicants = () =>{
+            let arr = [];
+            if(Applicants.applicants.length>0){
+                arr = [...Applicants.applicants,applicant]
+                return arr
+            }else{
+                arr = applicant
+                return arr
+            }
+        }
+        const JobProfile = await Jobprofile.findByIdAndUpdate({_id:id},
+            {
+                applicants: updateapplicants()
+            },
+            { new: true }
+            )
+        res.status(201).send(JobProfile)
+    }catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).send("Internal Server Error");
+      }
+}
+
+export{getJobprofiles,postJobprofile,updateJobprofile,addApplicant}

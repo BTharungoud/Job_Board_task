@@ -28,6 +28,9 @@ const JobSchema  = new mongoose.Schema({
     responsibilities:{
         type:String,
         required:true
+    },
+    applicants:{
+        type:[Object]
     }
 })
 
