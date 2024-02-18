@@ -1,11 +1,11 @@
 import React from "react";
-import {  useForm } from "react-hook-form";
-import { Box, Button,useToast } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { Box, Button, useToast } from "@chakra-ui/react";
 import CustomTextField from "./CustomTextField";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 const LoginForm = () => {
-  const {setUsermail} = useAuth();
+  const { setUsermail, setIsLogin, setIsAuthDrawerOpen } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const {
@@ -19,28 +19,33 @@ const LoginForm = () => {
       email: data.email,
       password: data.password,
     };
-    const response = await fetch("https://job-board-server-eo10.onrender.com/login", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(registerdata),
-    });
-    if(response.status !== (201 && 200)){
+    const response = await fetch(
+      "https://job-board-server-eo10.onrender.com/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerdata),
+      }
+    );
+    if (response.status !== (201 && 200)) {
       const responseBody = await response.text();
-      toast({ status:'error', description: responseBody })
-    }else{
-      setUsermail(data.email)
-      sessionStorage.setItem("email",data.email);
+      toast({ status: "error", description: responseBody });
+    } else {
+      setUsermail(data.email);
+      sessionStorage.setItem("email", data.email);
       const responseBody = await response.json();
-      console.log('Success:', responseBody);
-      toast({status:'success', description: `Login sucessfull` });
-      sessionStorage.setItem("Token",responseBody.token);
-      sessionStorage.setItem("Name",responseBody.fullname);
-      navigate('/careers')
+      console.log("Success:", responseBody);
+      toast({ status: "success", description: `Login sucessfull` });
+      sessionStorage.setItem("Token", responseBody.token);
+      sessionStorage.setItem("Name", responseBody.fullname);
+      navigate("/careers");
+      setIsAuthDrawerOpen(false);
+      setIsLogin(true);
     }
 
-    reset()
+    reset();
   };
   return (
     <Box
@@ -81,7 +86,7 @@ const LoginForm = () => {
           validate: (value) => {
             const password = /^(?=.*\d)(?=.*[!@#$%^&*]).*$/;
             if (!password.test(value)) {
-              return "Password should contain at least 1 special char";
+              return "Password should contain at least 1 special char, number";
             }
           },
         }}
