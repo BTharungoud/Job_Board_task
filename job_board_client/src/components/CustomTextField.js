@@ -18,6 +18,7 @@ const CustomTextField = ({
   helperText,
   placeholder,
   type,
+  
 }) => {
   return (
     <FormControl>
@@ -37,6 +38,9 @@ const CustomTextField = ({
             border={error ? "1px solid red" : "1px solid black"}
             padding="6px 4px 6px 8px"
             borderRadius="8px"
+            onChange={(e)=>
+              (e.target.files[0])
+            }
           />
         )}
         errors

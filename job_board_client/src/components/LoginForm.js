@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, useForm } from "react-hook-form";
+import {  useForm } from "react-hook-form";
 import { Box, Button,useToast } from "@chakra-ui/react";
 import CustomTextField from "./CustomTextField";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +31,7 @@ const LoginForm = () => {
       toast({ status:'error', description: responseBody })
     }else{
       setUsermail(data.email)
+      sessionStorage.setItem("email",data.email);
       const responseBody = await response.json();
       console.log('Success:', responseBody);
       toast({status:'success', description: `Login sucessfull` });
