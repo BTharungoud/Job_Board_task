@@ -1,21 +1,37 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "../components/NavBar";
-import { useAuth } from "../context/AuthContext";
 import { useToast } from "@chakra-ui/react";
+import NavBar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
 const Careerpage = () => {
-  const { userprofiledata, setIsAuthDrawerOpen, isLogin } = useAuth();
   const [search, setSearch] = useState("");
   const [expand, setExpand] = useState("");
   const [popup, setPopup] = useState(false);
+  const [userprofiledata, setUserProfileData] = useState([]);
   const [msg, setMsg] = useState("");
   const [jobid, setJobId] = useState("");
   const toast = useToast();
-  const navigate = useNavigate();
   const [jobprofiles, setJobprofiles] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
-    JobprofileFetch();
-  }, []);
+    const usermail = sessionStorage.email  
+    fetchData(usermail);
+    if(popup === false){
+      JobprofileFetch();
+    }
+  }, [(popup === false)]);
+  const fetchData = async (usermail) => {
+    try {
+      console.log(usermail);
+      const profilefetch = await fetch(
+        `https://job-board-server-eo10.onrender.com/profile?email=${usermail}`
+      );
+      const profiledata = await profilefetch.json();
+      setUserProfileData(profiledata);
+      console.log(profiledata);
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    }
+  };
   const JobprofileFetch = async () => {
     const fetchData = await fetch(
       "https://job-board-server-eo10.onrender.com/jobprofile"

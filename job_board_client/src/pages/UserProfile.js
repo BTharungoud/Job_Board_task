@@ -9,36 +9,40 @@ import { storage } from "../FirebaseConfig.js";
 import { useToast } from "@chakra-ui/react";
 export const UserProfile = () => {
   const toast = useToast();
-
-  const { userprofiledata,setOnpageload,onpageload } = useAuth();
+  const [userprofiledata, setUserProfileData] = useState([]);
+  const usermail = sessionStorage.email
+  const [resumelink, setResumelink] = useState(null);
+  const [additionalfilelink, setAdditionalfilelink] = useState(null);
   const {
     control,
     reset,
     handleSubmit,
     formState: { errors },
-  } = useForm({
-    defaultValues: userprofiledata[0],
-  });
-  // const [Name, setName] = useState("");
-  // const [resumedata, setResumeData] = useState(null);
-  const [resumelink, setResumelink] = useState(null);
-  // const [additionfiles, setAdditionfiles] = useState(null);
-  const [additionalfilelink, setAdditionalfilelink] = useState(null);
-  useEffect(()=>{
-    // const name = sessionStorage.Name
-    // if(name){setName(name)}
-    setOnpageload(true);
-    if(userprofiledata.length>0){
-      console.log('useEffect');
-      reset(userprofiledata[0])
+  } = useForm();
+  useEffect(() => {
+    fetchData(usermail)
+  }, [])
+  async function fetchData(usermail) {
+    try {
+      console.log(usermail);
+      const profilefetch = await fetch(
+        `https://job-board-server-eo10.onrender.com/profile?email=${usermail}`
+      );
+      const profiledata = await profilefetch.json();
+      setUserProfileData(profiledata);
+      console.log(profiledata);
+      reset(profiledata[0])
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    } finally {
+      return userprofiledata[0]
     }
-
-  },[])
-  async function handleuploadresume(resumedata){
+  };
+  async function handleuploadresume(resumedata) {
     const fullname = sessionStorage.Name;
-    console.log("resume",fullname,resumedata)
+    console.log("resume", fullname, resumedata)
     if (resumedata !== null) {
-    console.log("resume",fullname)
+      console.log("resume", fullname)
       const resumerif = ref(
         storage,
         `Resumes/${fullname}/${resumedata.name}`
@@ -54,7 +58,7 @@ export const UserProfile = () => {
       });
     }
   }
-  async function handleuploadfiles(additionfiles){
+  async function handleuploadfiles(additionfiles) {
     const fullname = sessionStorage.Name;
     if (additionfiles !== null) {
       const filesrif = ref(
@@ -78,21 +82,21 @@ export const UserProfile = () => {
     const stringifyobj = JSON.stringify(data)
     console.log(stringifyobj);
     toast({ title: "Fetch call started" });
-    const updateProfile = await fetch(`https://job-board-server-eo10.onrender.com/profile/update`,{
-      method:"PUT",
-      headers:{
+    const updateProfile = await fetch(`https://job-board-server-eo10.onrender.com/profile/update`, {
+      method: "PUT",
+      headers: {
         "Content-Type": "application/json",
       },
-      body:stringifyobj
+      body: stringifyobj
     })
-    if(updateProfile.status == 201){
+    if (updateProfile.status == 201) {
       toast({ title: "Profile updated" });
-    }else{
-      toast({title: "Something went wrong"})
+    } else {
+      toast({ title: "Something went wrong" })
     }
     const profiledata = await updateProfile.json();
     reset(profiledata)
-    setOnpageload(!onpageload);
+    // setOnpageload(!onpageload);
     console.log(profiledata)
   };
   return (
@@ -153,10 +157,10 @@ export const UserProfile = () => {
             rules={{ required: "City Required" }}
           />
           <label>Resume</label>
-          <input type="file" style={{padding:'1%',border:'1px solid black',borderRadius:'8px',width:'100%'}} onChange={(e)=>{handleuploadresume(e.target.files[0])}}/>
+          <input type="file" style={{ padding: '1%', border: '1px solid black', borderRadius: '8px', width: '100%' }} onChange={(e) => { handleuploadresume(e.target.files[0]) }} />
           <label>Additionalfiles</label>
-          <input type="file" style={{padding:'1%',border:'1px solid black',borderRadius:'8px',width:'100%'}} onChange={(e)=>{handleuploadfiles(e.target.files[0])}}/>
-        
+          <input type="file" style={{ padding: '1%', border: '1px solid black', borderRadius: '8px', width: '100%' }} onChange={(e) => { handleuploadfiles(e.target.files[0]) }} />
+
           <CustomTextField
             name="phone"
             control={control}

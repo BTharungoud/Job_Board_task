@@ -52,6 +52,7 @@ const Links = isLogin?[{name: "Careers", route: "careers"}]:[];
   const handleLogout = () => {
     setIsLogin(false);
     navigate("/");
+    sessionStorage.clear();
   };
   return (
     <>

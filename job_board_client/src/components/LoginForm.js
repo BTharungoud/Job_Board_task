@@ -40,9 +40,13 @@ const LoginForm = () => {
       toast({ status: "success", description: `Login sucessfull` });
       sessionStorage.setItem("Token", responseBody.token);
       sessionStorage.setItem("Name", responseBody.fullname);
-      navigate("/careers");
-      setIsAuthDrawerOpen(false);
-      setIsLogin(true);
+      if(responseBody.fullname === "Admin"){
+        navigate('/admin')
+      }else{
+          navigate("/careers");
+          setIsAuthDrawerOpen(false);
+          setIsLogin(true);
+      }
     }
 
     reset();
