@@ -3,7 +3,6 @@ import {
   Flex,
   Avatar,
   HStack,
-  Text,
   IconButton,
   Button,
   Menu,
@@ -19,11 +18,12 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import AuthDrawer from "./AuthDrawer";
+import { useNavigate } from "react-router-dom";
 
-const Links = ["Dashboard"];
+const Links = [{ name: "Dashboard", route: "careers" }];
 
 const NavLink = (props) => {
-  const { children } = props;
+  const { children, link } = props;
 
   return (
     <Box
@@ -35,7 +35,7 @@ const NavLink = (props) => {
         textDecoration: "none",
         color: useColorModeValue("#61dafb"),
       }}
-      href={"#"}
+      href={link}
     >
       {children}
     </Box>
@@ -44,13 +44,17 @@ const NavLink = (props) => {
 
 export default function NavBar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isAuthDrawerOpen, setIsAuthDrawerOpen] = useState(false);
   const [authType, setAuthType] = useState(0);
-
-  const { isLogin } = useAuth();
+  const navigate = useNavigate();
+  const { isLogin, isAuthDrawerOpen, setIsAuthDrawerOpen, setIsLogin } =
+    useAuth();
+  const handleLogout = () => {
+    setIsLogin(false);
+    navigate("/");
+  };
   return (
     <>
-      <Box borderBottom="1px solid #61dafb" width="100vw" px={4} >
+      <Box borderBottom="1px solid #61dafb" width="100vw" px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
             size={"md"}
@@ -67,7 +71,9 @@ export default function NavBar() {
               display={{ base: "none", md: "flex" }}
             >
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link} link={link.route}>
+                  {link.name}
+                </NavLink>
               ))}
             </HStack>
           </HStack>
@@ -88,11 +94,11 @@ export default function NavBar() {
                     }
                   />
                 </MenuButton>
-                <MenuList>
-                  <MenuItem>Link 1</MenuItem>
-                  <MenuItem>Link 2</MenuItem>
+                <MenuList color="black">
+                  <MenuItem> Profile</MenuItem>
+                  <MenuItem>Applications</MenuItem>
                   <MenuDivider />
-                  <MenuItem>Link 3</MenuItem>
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>
               </Menu>
             ) : (
@@ -125,7 +131,9 @@ export default function NavBar() {
           <Box pb={4} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link} link={link.route}>
+                  {link.name}
+                </NavLink>
               ))}
             </Stack>
           </Box>

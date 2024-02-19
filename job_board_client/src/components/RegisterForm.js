@@ -2,9 +2,10 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import CustomTextField from "./CustomTextField";
 import { Button, Box, useToast } from "@chakra-ui/react";
+import { useAuth } from "../context/AuthContext";
 
 const RegisterForm = () => {
-  const toast = useToast()
+  const toast = useToast();
   const {
     control,
     reset,
@@ -12,35 +13,43 @@ const RegisterForm = () => {
     formState: { errors },
   } = useForm();
   const onSubmit = async (data) => {
+    console.log("data", data);
     const registerdata = {
       fullname: data.Name,
       email: data.Email,
       password: data.Password,
     };
-    console.log(data)
-    const response = await fetch("https://job-board-server-eo10.onrender.com/login/register", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(registerdata),
-    });
-    const responseBody = await response.text();
-      const userdata = {
-        fullname : data.Name,
-        email : data.Email
-      }
-      const signupuser = await fetch("https://job-board-server-eo10.onrender.com/profile/signup",{
-        method:"POST",
-        headers:{
-            'Content-Type': 'application/json',
+    console.log(data);
+    const response = await fetch(
+      "https://job-board-server-eo10.onrender.com/login/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(userdata)  
-      })
-      const signupdata = await signupuser.json()
-      console.log(signupdata)
-    console.log('Success:', responseBody);
+        body: JSON.stringify(registerdata),
+      }
+    );
+    const responseBody = await response.text();
+    const userdata = {
+      fullname: data.Name,
+      email: data.Email,
+    };
+    const signupuser = await fetch(
+      "https://job-board-server-eo10.onrender.com/profile/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userdata),
+      }
+    );
+    const signupdata = await signupuser.json();
+    console.log(signupdata);
+    console.log("Success:", responseBody);
     toast({ description: `Fetch resolved ${responseBody}` });
+
     reset();
   };
   return (
@@ -60,7 +69,10 @@ const RegisterForm = () => {
         control={control}
         type="text"
         placeholder="Name"
-        errors={errors}
+        error={errors.Name}
+        rules={{
+          required: "Name is required",
+        }}
       />
       <CustomTextField
         name="Email"
@@ -68,7 +80,17 @@ const RegisterForm = () => {
         control={control}
         type="text"
         placeholder="johndoe@mail.com"
-        errors={errors}
+        error={errors.Email}
+        rules={{
+          required: "Email is required",
+          validate: (value) => {
+            const emailRegex =
+              /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(value)) {
+              return "Enter a valid email";
+            }
+          },
+        }}
       />
       <CustomTextField
         name="Password"
@@ -76,7 +98,16 @@ const RegisterForm = () => {
         control={control}
         type="password"
         placeholder="Password"
-        errors={errors}
+        error={errors.Password}
+        rules={{
+          required: "Password is required",
+          validate: (value) => {
+            const password = /^(?=.*\d)(?=.*[!@#$%^&*]).*$/;
+            if (!password.test(value)) {
+              return "Password should contain at least 1 special char";
+            }
+          },
+        }}
       />
       <Button
         width="250px"
