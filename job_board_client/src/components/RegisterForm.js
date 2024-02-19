@@ -13,7 +13,7 @@ const RegisterForm = () => {
     formState: { errors },
   } = useForm();
   const onSubmit = async (data) => {
-    console.log("data", data);
+    toast({title:'Wait we are you registry.'})
     const registerdata = {
       fullname: data.Name,
       email: data.Email,

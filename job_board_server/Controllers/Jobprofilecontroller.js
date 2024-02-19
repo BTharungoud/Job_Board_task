@@ -20,7 +20,8 @@ const postJobprofile = async (req,res)=>{
             education:education,
             openings:openings,
             jobdescripition:jobdescripition,
-            responsibilities:responsibilities
+            responsibilities:responsibilities,
+            applicants:[]
         })
         await JobProfile.save()
         res.status(201).send(JobProfile)
@@ -63,7 +64,7 @@ const addApplicant = async (req,res) => {
                 arr = [...Applicants.applicants,applicant]
                 return arr
             }else{
-                arr = applicant
+                arr.push(applicant)
                 return arr
             }
         }

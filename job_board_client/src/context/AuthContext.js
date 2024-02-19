@@ -7,6 +7,7 @@ const AuthProvider = ({ children }) => {
   const [usermail, setUsermail] = useState("");
   const [userprofiledata, setUserProfileData] = useState([]);
   const [isAuthDrawerOpen, setIsAuthDrawerOpen] = useState(false);
+  const [onpageload, setOnpageload] = useState(false)
   const toast = useToast();
 
   useEffect(() => {
@@ -26,7 +27,8 @@ const AuthProvider = ({ children }) => {
       }
     };
     fetchData();
-  }, [usermail]);
+    if(mail)setIsLogin(true);
+  }, [usermail,onpageload]);
 
   const values = {
     isLogin,
@@ -34,6 +36,8 @@ const AuthProvider = ({ children }) => {
     usermail,
     setUsermail,
     userprofiledata,
+    onpageload,
+    setOnpageload,
     isAuthDrawerOpen,
     setIsAuthDrawerOpen,
   };

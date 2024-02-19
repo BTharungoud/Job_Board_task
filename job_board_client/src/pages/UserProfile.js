@@ -10,58 +10,90 @@ import { useToast } from "@chakra-ui/react";
 export const UserProfile = () => {
   const toast = useToast();
 
-  // (async()=>{
-  const { userprofiledata } = useAuth();
-  // }
-  // )()
+  const { userprofiledata,setOnpageload,onpageload } = useAuth();
   const {
     control,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
     defaultValues: userprofiledata[0],
   });
-  const [resumedata, setResumeData] = useState(null);
+  // const [Name, setName] = useState("");
+  // const [resumedata, setResumeData] = useState(null);
   const [resumelink, setResumelink] = useState(null);
-  // useEffect(()=>{
+  // const [additionfiles, setAdditionfiles] = useState(null);
+  const [additionalfilelink, setAdditionalfilelink] = useState(null);
+  useEffect(()=>{
+    // const name = sessionStorage.Name
+    // if(name){setName(name)}
+    setOnpageload(true);
+    if(userprofiledata.length>0){
+      console.log('useEffect');
+      reset(userprofiledata[0])
+    }
 
-  // },[])
-  const onSubmit = async (data) => {
-    console.log(data, data.resume);
-    if (data.resume !== null) {
-      setResumeData(data.resume.target.files[0]);
-      const resumerif = await ref(
+  },[])
+  async function handleuploadresume(resumedata){
+    const fullname = sessionStorage.Name;
+    console.log("resume",fullname,resumedata)
+    if (resumedata !== null) {
+    console.log("resume",fullname)
+      const resumerif = ref(
         storage,
-        `Resumes/${data.fullname}/${resumedata.name}`
+        `Resumes/${fullname}/${resumedata.name}`
       );
       uploadBytes(resumerif, resumedata).then((snapshot) => {
         toast({ title: "resume uploaded downloading url" });
         getDownloadURL(snapshot.ref)
           .then((url) => {
             setResumelink(url);
-            data.resume = url;
+            console.log(url);
           })
           .catch((err) => console.log(err, "err at downloading url"));
       });
     }
-    if (data.additionalfiles.target.files[0] !== null) {
-      const filerif = ref(
+  }
+  async function handleuploadfiles(additionfiles){
+    const fullname = sessionStorage.Name;
+    if (additionfiles !== null) {
+      const filesrif = ref(
         storage,
-        `Additionalfiles/${data.fullname}/${data.additionalfiles.target.files[0].name}`
+        `Additionalfiles/${fullname}/${additionfiles.name}`
       );
-      uploadBytes(filerif, data.additionalfiles.target.files[0]).then(
-        (snapshot) => {
-          toast({ title: "file uploaded downloading url" });
-          getDownloadURL(snapshot.ref)
-            .then((url) => {
-              data.additionalfiles = url;
-            })
-            .catch((err) => console.log(err, "err at downloading url"));
-        }
-      );
+      uploadBytes(filesrif, additionfiles).then((snapshot) => {
+        toast({ title: "file uploaded downloading url" });
+        getDownloadURL(snapshot.ref)
+          .then((url) => {
+            setAdditionalfilelink(url);
+            console.log(url);
+          })
+          .catch((err) => console.log(err, "err at downloading url"));
+      });
     }
-    console.log(data);
+  }
+  const onSubmit = async (data) => {
+    data.resume = resumelink;
+    data.additionalfiles = [additionalfilelink]
+    const stringifyobj = JSON.stringify(data)
+    console.log(stringifyobj);
     toast({ title: "Fetch call started" });
+    const updateProfile = await fetch(`https://job-board-server-eo10.onrender.com/profile/update`,{
+      method:"PUT",
+      headers:{
+        "Content-Type": "application/json",
+      },
+      body:stringifyobj
+    })
+    if(updateProfile.status == 201){
+      toast({ title: "Profile updated" });
+    }else{
+      toast({title: "Something went wrong"})
+    }
+    const profiledata = await updateProfile.json();
+    reset(profiledata)
+    setOnpageload(!onpageload);
+    console.log(profiledata)
   };
   return (
     <div style={{ width: "100%" }}>
@@ -120,21 +152,11 @@ export const UserProfile = () => {
             error={errors}
             rules={{ required: "City Required" }}
           />
-          <CustomTextField
-            name="resume"
-            control={control}
-            label="Resume"
-            error={errors}
-            rules={{ required: "resume Required" }}
-            type="file"
-          />
-          <CustomTextField
-            name="additionalfiles"
-            control={control}
-            label="Additionalfiles"
-            error={errors}
-            type="file"
-          />
+          <label>Resume</label>
+          <input type="file" style={{padding:'1%',border:'1px solid black',borderRadius:'8px',width:'100%'}} onChange={(e)=>{handleuploadresume(e.target.files[0])}}/>
+          <label>Additionalfiles</label>
+          <input type="file" style={{padding:'1%',border:'1px solid black',borderRadius:'8px',width:'100%'}} onChange={(e)=>{handleuploadfiles(e.target.files[0])}}/>
+        
           <CustomTextField
             name="phone"
             control={control}

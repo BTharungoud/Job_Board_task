@@ -20,7 +20,6 @@ import { useState } from "react";
 import AuthDrawer from "./AuthDrawer";
 import { useNavigate } from "react-router-dom";
 
-const Links = [{ name: "Dashboard", route: "careers" }];
 
 const NavLink = (props) => {
   const { children, link } = props;
@@ -48,6 +47,8 @@ export default function NavBar() {
   const navigate = useNavigate();
   const { isLogin, isAuthDrawerOpen, setIsAuthDrawerOpen, setIsLogin } =
     useAuth();
+const Links = isLogin?[{name: "Careers", route: "careers"}]:[];
+
   const handleLogout = () => {
     setIsLogin(false);
     navigate("/");
@@ -64,7 +65,7 @@ export default function NavBar() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={"center"}>
-            <Box>Logo</Box>
+            <Box>TCN</Box>
             <HStack
               as={"nav"}
               spacing={4}
@@ -95,8 +96,8 @@ export default function NavBar() {
                   />
                 </MenuButton>
                 <MenuList color="black">
-                  <MenuItem> Profile</MenuItem>
-                  <MenuItem>Applications</MenuItem>
+                  <MenuItem onClick={()=>navigate("/user")}> Profile</MenuItem>
+                  {/* <MenuItem>Applications</MenuItem> */}
                   <MenuDivider />
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>

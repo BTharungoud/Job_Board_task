@@ -40,7 +40,7 @@ const Careerpage = () => {
   async function handlesubmit(email) {
     toast({ title: "applying with profile details" });
     const bodydata = {
-      _id: jobid,
+      id: jobid,
       email: email,
     };
     const applyjob = await fetch(
@@ -57,6 +57,7 @@ const Careerpage = () => {
     console.log(profileapplied);
     if (applyjob.status === (201 || 200)) {
       toast({ title: "applied sucessfully" });
+      setPopup(false);
     }
   }
   return (
@@ -154,24 +155,22 @@ const Careerpage = () => {
                         justifyContent: "flex-end",
                       }}
                     >
-                      <button
-                        onClick={() => {
-                          if (!isLogin) {
-                            setIsAuthDrawerOpen(true);
+                      {(profile.applicants.length>0&&profile.applicants.map((ele)=>{if(ele.email == userprofiledata[0].email)return true;else return false}))?"Applied with profile":
+                        <button
+                          onClick={() => {
+                            setPopup(true);
+                            handleApply(profile._id);
                             return;
-                          }
-                          setPopup(true);
-                          handleApply(profile._id);
-                          return;
-                        }}
-                        style={{
-                          borderRadius: "5px",
-                          backgroundColor: "#61dafb",
-                          padding: "0.5%",
-                        }}
-                      >
-                        Apply
-                      </button>
+                          }}
+                          style={{
+                            borderRadius: "5px",
+                            backgroundColor: "#61dafb",
+                            padding: "0.5%",
+                          }}
+                        >
+                          Apply
+                        </button>
+                      }
                     </div>
                   </div>
                   <div
@@ -228,15 +227,15 @@ const Careerpage = () => {
                         <div style={{ width: "100%" }}>
                           Review Application:-
                           <br />
-                          Name:-{userprofiledata.fullname}
+                          Name:-<span>{userprofiledata[0].fullname}</span>
                           <br />
-                          Email:-{userprofiledata.email}
+                          Email:-<span>{userprofiledata[0].email}</span>
                           <br />
-                          Dateofbirth:-{userprofiledata.dob}
+                          Dateofbirth:-<span>{userprofiledata[0].dob}</span>
                           <br />
-                          Phone:-{userprofiledata.phone}
+                          Phone:-<span>{userprofiledata[0].phone}</span>
                           <br />
-                          description:-{userprofiledata.description}
+                          description:-<span>{userprofiledata[0].description}</span>
                           <br />
                           <div
                             style={{
@@ -257,7 +256,7 @@ const Careerpage = () => {
                             </button>
                             <button
                               onClick={() =>
-                                handlesubmit(profile._id, userprofiledata.email)
+                                handlesubmit(userprofiledata[0].email)
                               }
                               style={{
                                 backgroundColor: "#61dafb",
